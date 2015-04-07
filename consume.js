@@ -17,13 +17,14 @@ var Tweet = mongoose.model('Tweet', { tweet: String });
 
 var client = new Twitter(JSON.parse(fs.readFileSync('auth.json')));
 
+var num = 0;
+
 client.stream('statuses/filter', { track: keywords.toString(), location: usa }, function(stream) {
-  var num = 0;
   stream.on('data', function(data) {
     var tweet = new Tweet({ tweet: JSON.stringify(data) });
     tweet.save(function(error) {
       if(error) { console.log(error); }
-      else { num++; console.log('wrote tweet '+num); }
+      else { num++; }
     });
   });
 
@@ -32,3 +33,7 @@ client.stream('statuses/filter', { track: keywords.toString(), location: usa }, 
   });
 
 });
+
+setInterval(function() {
+  console.log('tweets: '+num+'\t'+'time: '+new Date());
+}, 30000);

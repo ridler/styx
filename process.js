@@ -30,10 +30,13 @@ Stats.find({}, function(error, stat) {
   }
 });
 
+var num = 0;
+
 var processTweets = function() {
 
   var stream = Tweet.find().stream();
   stream.on('data', function(data) {
+    num++;
     try {
       var tweet = JSON.parse(data.tweet);
 
@@ -69,7 +72,6 @@ var processTweets = function() {
   });
 
   stream.on('close', function() {
-    //console.log(stats);
     Tweet.remove({}, function() {});
     Stats.remove({}, function() {});
     var write = new Stats({ numbers: JSON.stringify(stats) });
@@ -79,10 +81,10 @@ var processTweets = function() {
 }
 
 var clean = function() {
+  console.log('processed: '+num+'\t time: '+new Date());
   Located.find({}, function(error, tweets) {
-    console.log(tweets.length);
-    if(tweets.length > 200) {
-      var gone = tweets.slice(150, tweets.length);
+    if(tweets.length > 300) {
+      var gone = tweets.slice(280, tweets.length);
       gone.forEach(function(e) {
         Located.remove({ _id: e._id }, function() {});
       });
@@ -92,4 +94,4 @@ var clean = function() {
 
 processTweets();
 
-setInterval(clean, 15000);
+setInterval(clean, 30000);
