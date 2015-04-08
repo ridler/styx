@@ -26,7 +26,6 @@ var Coords = mongoose.model('Coords', {
   word: String
 });
 
-var routes = require('./routes');
 var app = express();
 
 var http = require('http').Server(app);
