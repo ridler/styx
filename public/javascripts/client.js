@@ -8,7 +8,10 @@
 
     var update = function() {
       $http.get('/stats').success(function(data) {
-        if(data) { ui.stats = angular.fromJson(data); }
+        if(data) {
+          ui.stats = angular.fromJson(data);
+          graph.maxValue = ui.stats.totals.misogynistic + 200;
+        }
       });
     };
 
@@ -29,7 +32,8 @@
     var ctx = createCanvas("graphDiv1");
 
     var graph = new BarGraph(ctx);
-    graph.maxValue = 200000;
+    console.log(ui.stats);
+    // graph.maxValue = ui.stats.totals.misogynistic + 2000;
     graph.margin = 2;
     graph.colors = ["#49a0d8", "#d353a0", "#ffc527", "#df4c27"];
     graph.xAxisLabelArr = ["Racist", "Misogynistic", "Homophobic"];
