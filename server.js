@@ -21,16 +21,17 @@ for(var category in categories) { totals[category] = 0; percentages[category] = 
 var Tweet = mongoose.model('Tweet', { tweet: String });
 var Stats = mongoose.model('Stats', { numbers: String });
 var Located = mongoose.model('Located', { data: String });
-var Coords = mongoose.model('Coords', {
-  coordinates: String,
-  word: String
-});
+var Coords = mongoose.model('Coords', { coordinates: String, word: String });
 
 var app = express();
 
 var http = require('http').Server(app);
 
 app.get('/', function(req, res) {
+  res.render('index');
+});
+
+app.get('/stats', function(req, res) {
   var totals = {}; var percentages = {};
   for(var category in categories) { totals[category] = 0; percentages[category] = 0 };
   Stats.find({}, function(error, stats) {
