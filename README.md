@@ -1,5 +1,5 @@
 # STYX
-Keyword processing for the Twitter Streaming API.
+STYX does keyword processing for the Twitter Streaming API.  It will categorize tweets in the USA based on categories and words that the user provides.  It uses MongoDB as a cache as well as to store all relevant generated data.  Tweets with geocoordinates will be saved for mapping purposes.  The last 300 tweets consumed with geocoordinates will be mapped in real time on the UI.
 
 ## Setup
 
@@ -51,3 +51,22 @@ You must provide the connection URI of a MongoDB instance and an Express server 
   }
 }
 ```
+### Running the System
+Run each of the following commands seperately and make sure they output something that isn't an error.
+```bash
+node consume.js
+node process.js
+node server.js
+```
+Data should start appearing on a webpage at `localhost:8080` after a few seconds.
+
+## Files
+- `server.js` provides web applications features through Express.js.  It serves content in `public/` and `views/`.
+- `consume.js` establishes a connection to the Twitter API and writes tweets to mongo as soon as they are recieved.
+- `process.js` reads tweets off of mongo and does initial processing on them.  It then writes generated data back to the same mongo instance.
+
+# TO DO
+- Implement direct streaming of data between `process.js` and `server.js`.
+- Implement richer processing of the data.
+- Map the geolocated data.
+- Develop a real UI.
