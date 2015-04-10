@@ -37,7 +37,7 @@ app.get('/stats', function(req, res) {
   Stats.find({}, function(error, stats) {
     if(error) { res.send(error); }
     else {
-      try{
+      try {
         var nums = JSON.parse(stats[0].numbers);
         var keys = Object.keys(nums);
         var all = 0;
