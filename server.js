@@ -18,6 +18,14 @@ var categories = JSON.parse(fs.readFileSync('keywords.json'));
 var totals = {}; var percentages = {};
 for(var category in categories) { totals[category] = 0; percentages[category] = 0 };
 
+var color = function(word) {
+  for(var category in categories) {
+    if(categories[category].track.contains(word)) {
+      return categories[category]['color'];
+    }
+  }
+};
+
 var Tweet = mongoose.model('Tweet', { tweet: String });
 var Stats = mongoose.model('Stats', { numbers: String });
 var Located = mongoose.model('Located', { data: String });
@@ -31,10 +39,30 @@ app.get('/', function(req, res) {
   res.render('index');
 });
 
-app.get('/3hun', function(req, res) {
-  Located.find({}, function(error, tweets) {
+app.get('/coords', function(req, res) {
+  Coords.find({}, function(error, data) {
     if(error) { res.send(error); }
-    else { res.send(tweets); }
+    else {
+      var extract = [];
+      data.forEach(function(e) {
+        extract.push({
+          coordinates: e.coordinates.split(',').reverse(),
+          color: color(e.word)
+        });
+      });
+      res.send(extract);
+    }
+  });
+})
+
+app.get('/3hun', function(req, res) {
+  Located.find({}, function(error, data) {
+    if(error) { res.send(error); }
+    else {
+      var extract = [];
+      data.forEach(function(e) { extract.push(JSON.parse(e.data)); });
+      res.send(extract);
+    }
   });
 });
 

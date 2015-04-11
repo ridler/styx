@@ -11,11 +11,15 @@
 <body ng-controller="graphics as ui">
 	<div class="container">
 		<h1>{{ui.title}}</h1>
-		<div id="usa-map"></div>
+		<div id="heat-map"></div>
+		<br />
+		<div id="mark-map"></div>
 		<div id="map-side">
+			<button ng-click="ui.showMarkers()" ng-show="!ui.markers" class="btn btn-info">Show Markers</button>
+			<button ng-click="ui.hideMarkers()" ng-show="ui.markers"class="btn btn-warning">Hide Markers</button>
 			<table class="table-condensed">
-				<tr ng-repeat="stat in ui.stats.percentages">
-					<td>{{stat}}</td>
+				<tr ng-repeat="tweet in ui.tweets">
+					<td>{{tweet.text}}</td>
 				</tr>
 			</table>
 		</div>

@@ -4,19 +4,55 @@
   app.controller('graphics', ['$http', function($http) {
     var ui = this;
     ui.title = 'Categorical Statistics';
+    ui.markers = false;
     ui.stats = {};
     ui.categories = [];
+    ui.tweets = [];
+    ui.coords = [];
 
-    var map = L.map('usa-map').setView([38.50, -95.35], 4);
+    var map = L.map('heat-map').setView([38.50, -95.35], 4);
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
+    var map2 = L.map('mark-map').setView([38.50, -95.35], 4);
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map2);
+
     map.scrollWheelZoom.disable();
 
-    $http.get('/3hun').success(function(data) {
-      console.log(data);
+    $http.get('/coords').success(function(data) {
+      ui.coords = data;
+      ui.coords.forEach(function(coord) {
+        var latlong = coord.coordinates;
+        var circle = L.circle(latlong, 100, {
+          color: coord.color,
+          fillColor: coord.color,
+          fillOpacity: 0.5
+        }).addTo(map);
+      });
+
     });
+
+    ui.showMarkers = function() {
+      $http.get('/3hun').success(function(data) {
+        ui.tweets = data;
+        ui.tweets.forEach(function(tweet) {
+          var latlong = tweet.coordinates.coordinates.reverse();
+          var marker = L.marker(latlong).addTo(map2);
+          marker.bindPopup(tweet.text)
+        });
+        ui.markers = true;
+      });
+    };
+
+    ui.hideMarkers = function() {
+      ui.tweets.forEach(function(tweet) {
+        map.removeLayer(L.marker(tweet.coordinates.reverse()));
+      });
+      ui.markers = false;
+    };
 
     var update = function() {
       $http.get('/stats').success(function(data) {
