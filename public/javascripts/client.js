@@ -7,10 +7,16 @@
     ui.stats = {};
     ui.categories = [];
 
-    var map = L.map('usa-map').setView([40.010098, -105.268359], 13);
+    var map = L.map('usa-map').setView([38.50, -95.35], 4);
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
+
+    map.scrollWheelZoom.disable();
+
+    $http.get('/3hun').success(function(data) {
+      console.log(data);
+    });
 
     var update = function() {
       $http.get('/stats').success(function(data) {

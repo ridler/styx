@@ -31,6 +31,13 @@ app.get('/', function(req, res) {
   res.render('index');
 });
 
+app.get('/3hun', function(req, res) {
+  Located.find({}, function(error, tweets) {
+    if(error) { res.send(error); }
+    else { res.send(tweets); }
+  });
+});
+
 app.get('/stats', function(req, res) {
   var totals = {}; var percentages = {};
   for(var category in categories) { totals[category] = 0; percentages[category] = 0 };

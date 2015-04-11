@@ -1,7 +1,15 @@
 .body .html { height: 100%; }
 
 #usa-map {
+  display: inline-block;
   height: 400px;
+  width: 75%;
+}
+
+#map-side {
+  display: inline-block;
+  height: 400px;
+  width:20%;
 }
 
 .bar {
