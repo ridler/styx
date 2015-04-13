@@ -66,6 +66,10 @@ app.get('/3hun', function(req, res) {
   });
 });
 
+app.get('/kwconf', function(req, res) {
+  res.send(categories);
+});
+
 app.get('/stats', function(req, res) {
   var totals = {}; var percentages = {};
   for(var category in categories) { totals[category] = 0; percentages[category] = 0 };
@@ -78,7 +82,7 @@ app.get('/stats', function(req, res) {
         var all = 0;
         keys.forEach(function(key) {
           for(var category in categories) {
-            if(categories[category].contains(key)){
+            if(categories[category].track.contains(key)){
               totals[category] += nums[key];
               all += nums[key]
             }

@@ -9,6 +9,8 @@
     ui.categories = [];
     ui.tweets = [];
     ui.coords = [];
+    ui.keyColors = [];
+    ui.cText = "Click on a circle to the right to see more information about it here."
 
     var map = L.map('heat-map').setView([38.50, -95.35], 4);
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -21,38 +23,41 @@
     }).addTo(map2);
 
     map.scrollWheelZoom.disable();
+    map2.scrollWheelZoom.disable();
 
-    $http.get('/coords').success(function(data) {
-      ui.coords = data;
-      ui.coords.forEach(function(coord) {
-        var latlong = coord.coordinates;
-        var circle = L.circle(latlong, 100, {
-          color: coord.color,
-          fillColor: coord.color,
-          fillOpacity: 0.5
-        }).addTo(map);
-      });
-
+    $http.get('/kwconf').success(function(data) {
+      for(var key in data) {
+        ui.keyColors.push(data[key].color);
+      }
     });
 
-    ui.showMarkers = function() {
-      $http.get('/3hun').success(function(data) {
-        ui.tweets = data;
-        ui.tweets.forEach(function(tweet) {
-          var latlong = tweet.coordinates.coordinates.reverse();
-          var marker = L.marker(latlong).addTo(map2);
-          marker.bindPopup(tweet.text)
+    $http.get('/coords').success(function(data) {
+      if(data != {}) {
+        ui.coords = data;
+        ui.coords.forEach(function(coord) {
+          var latlong = coord.coordinates;
+          var circle = L.circle(latlong, 100, {
+            color: coord.color,
+            fillColor: coord.color,
+            fillOpacity: 0.5
+          }).addTo(map);
         });
-        ui.markers = true;
-      });
-    };
+      }
+    });
 
-    ui.hideMarkers = function() {
+    $http.get('/3hun').success(function(data) {
+      ui.tweets = data;
+      console.log(data[0]);
       ui.tweets.forEach(function(tweet) {
-        map.removeLayer(L.marker(tweet.coordinates.reverse()));
+        var latlong = tweet.coordinates.coordinates.reverse();
+        var circle = L.circle(latlong, 30000, {
+          color: 'purple',
+          fillColor: 'pink',
+          fillOpacity: 0.75
+        }).addTo(map2);
+        circle.bindPopup(tweet.text)
       });
-      ui.markers = false;
-    };
+    });
 
     var update = function() {
       $http.get('/stats').success(function(data) {
@@ -85,27 +90,29 @@
     var ctx = createCanvas("graphDiv1");
 
     var graph = new BarGraph(ctx);
-    graph.margin = 2;
-    graph.colors = ["#49a0d8", "#d353a0", "#ffc527", "#df4c27"];
+    graph.margin = 1;
+    graph.colors = ui.keyColors;
     graph.xAxisLabelArr = ui.categories;
     setInterval(function () {
-      update();
-      var nums = [];
-      for(n in ui.stats.totals) { nums.push(ui.stats.totals[n]); }
-      graph.update(nums);
-    }, 7000);
+      try {
+        update();
+        var nums = [];
+        for(n in ui.stats.totals) { nums.push(ui.stats.totals[n]); }
+        if(ui.stats != null) { graph.update(nums); }
+      } catch(e) {}
+    }, 5000);
 
-    var live = createCanvas("graphDiv2");
+    // var live = createCanvas("graphDiv2");
 
-    var g2 = new BarGraph(live);
-    g2.maxValue = 50;
-    g2.margin = 2;
-    g2.colors = ["#49a0d8", "#d353a0", "#ffc527", "#df4c27"];
-    g2.xAxisLabelArr = ui.categories;
-    setInterval(function () {
-      update();
-      g2.update([Math.random()*50, Math.random()*50, Math.random()*50]);
-    }, 1000);
+    // var g2 = new BarGraph(live);
+    // g2.maxValue = 50;
+    // g2.margin = 2;
+    // g2.colors = ["#49a0d8", "#d353a0", "#ffc527", "#df4c27"];
+    // g2.xAxisLabelArr = ui.categories;
+    // setInterval(function () {
+    //   update();
+    //   g2.update([Math.random()*50, Math.random()*50, Math.random()*50]);
+    // }, 1000);
   }]);
 
 }());

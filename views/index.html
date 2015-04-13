@@ -12,22 +12,16 @@
 	<div class="container">
 		<h1>{{ui.title}}</h1>
 		<div id="heat-map"></div>
+		<div id="map-side">
+			<p>{{ui.stats.totals}}</p>
+			<p>{{ui.stats.percentages}}</p>
+		</div>
 		<br />
 		<div id="mark-map"></div>
-		<div id="map-side">
-			<button ng-click="ui.showMarkers()" ng-show="!ui.markers" class="btn btn-info">Show Markers</button>
-			<button ng-click="ui.hideMarkers()" ng-show="ui.markers"class="btn btn-warning">Hide Markers</button>
-			<table class="table-condensed">
-				<tr ng-repeat="tweet in ui.tweets">
-					<td>{{tweet.text}}</td>
-				</tr>
-			</table>
-		</div>
 
 		<br />
 		<div id="graphDiv1"></div>
 		<br />
-		<div id="graphDiv2"></div>
 	</div>
 	<!--[if IE]><script src="excanvas.js"></script><![endif]-->
 	<script src="javascripts/bar-graph.js"></script>

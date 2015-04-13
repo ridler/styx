@@ -9,7 +9,7 @@ var categories = JSON.parse(fs.readFileSync('keywords.json'));
 var keywords = [];
 
 for(var category in categories) {
-  categories[category].forEach(function(word) { keywords.push(word); });
+  categories[category].track.forEach(function(word) { keywords.push(word); });
 }
 var usa = '-125.4,27.5,-58.9,50.3';
 

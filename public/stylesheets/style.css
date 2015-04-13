@@ -1,9 +1,9 @@
 .body .html { height: 100%; }
 
 #heat-map {
-  display: block;
+  display: inline-block;
   height: 400px;
-  width: 100%;
+  width: 74%;
 }
 
 #mark-map {
@@ -16,7 +16,7 @@
   display: inline-block;
   overflow: scroll;
   height: 400px;
-  width:24%;
+  width:25%;
 }
 
 .bar {

@@ -15,12 +15,12 @@
 function BarGraph(ctx) {
 
   // Private properties and methods
-	
+
   var that = this;
   var startArr;
   var endArr;
   var looping = false;
-		
+
   // Loop method adjusts the height of bar and redraws if neccessary
 	var loop = function () {
 
@@ -29,7 +29,7 @@ function BarGraph(ctx) {
 
 	  // Boolean to prevent update function from looping if already looping
 	  looping = true;
-	  
+
 	  // For each bar
 	  for (var i = 0; i < endArr.length; i += 1) {
 		// Change the current bar height toward its target height
@@ -49,10 +49,10 @@ function BarGraph(ctx) {
 		setTimeout(loop, that.animationInterval / that.animationSteps);
 	  }
 	};
-		
+
   // Draw method updates the canvas with the current display
 	var draw = function (arr) {
-							
+
 	  var numOfBars = arr.length;
 	  var barWidth;
 	  var barHeight;
@@ -66,34 +66,34 @@ function BarGraph(ctx) {
 	  var graphAreaWidth = that.width;
 	  var graphAreaHeight = that.height;
 	  var i;
-	  
+
 		// Update the dimensions of the canvas only if they have changed
 	  if (ctx.canvas.width !== that.width || ctx.canvas.height !== that.height) {
 		ctx.canvas.width = that.width;
 		ctx.canvas.height = that.height;
 	  }
-				
+
 	  // Draw the background color
 	  ctx.fillStyle = that.backgroundColor;
 	  ctx.fillRect(0, 0, that.width, that.height);
-					
-	  // If x axis labels exist then make room	
+
+	  // If x axis labels exist then make room
 	  if (that.xAxisLabelArr.length) {
 		graphAreaHeight -= 40;
 	  }
-				
+
 	  // Calculate dimensions of the bar
 	  barWidth = graphAreaWidth / numOfBars - that.margin * 2;
 	  maxBarHeight = graphAreaHeight - 25;
-				
+
 	  // Determine the largest value in the bar array
 	  var largestValue = 0;
 	  for (i = 0; i < arr.length; i += 1) {
 		if (arr[i] > largestValue) {
-		  largestValue = arr[i];	
+		  largestValue = arr[i];
 		}
 	  }
-	  
+
 	  // For each bar
 	  for (i = 0; i < arr.length; i += 1) {
 		// Set the ratio of current bar compared to the maximum
@@ -102,22 +102,22 @@ function BarGraph(ctx) {
 		} else {
 		  ratio = arr[i] / largestValue;
 		}
-		
+
 		barHeight = ratio * maxBarHeight;
-	  
+
 		// Turn on shadow
 		ctx.shadowOffsetX = 2;
 		ctx.shadowOffsetY = 2;
 		ctx.shadowBlur = 2;
 		ctx.shadowColor = "#999";
-						
+
 		// Draw bar background
-		ctx.fillStyle = "#333";			
+		ctx.fillStyle = "#333";
 		ctx.fillRect(that.margin + i * that.width / numOfBars,
 		  graphAreaHeight - barHeight,
 		  barWidth,
 		  barHeight);
-			
+
 		// Turn off shadow
 		ctx.shadowOffsetX = 0;
 		ctx.shadowOffsetY = 0;
@@ -149,8 +149,8 @@ function BarGraph(ctx) {
 			graphAreaHeight - barHeight - 10);
 		} catch (ex) {}
 		// Draw bar label if it exists
-		if (that.xAxisLabelArr[i]) {					
-		  // Use try / catch to stop IE 8 from going to error town				
+		if (that.xAxisLabelArr[i]) {
+		  // Use try / catch to stop IE 8 from going to error town
 		  ctx.fillStyle = "#333";
 		  ctx.font = "bold 12px sans-serif";
 		  ctx.textAlign = "center";
@@ -164,9 +164,9 @@ function BarGraph(ctx) {
 	  };
 
   // Public properties and methods
-	
+
   this.width = 300;
-  this.height = 150;	
+  this.height = 150;
   this.maxValue = 1000000;
   this.margin = 5;
   this.colors = ["purple", "red", "green", "yellow"];
@@ -176,11 +176,11 @@ function BarGraph(ctx) {
   this.yAxisLabelArr = [];
   this.animationInterval = 100;
   this.animationSteps = 10;
-	
+
   // Update method sets the end bar array and starts the animation
 	this.update = function (newArr) {
 
-	  // If length of target and current array is different 
+	  // If length of target and current array is different
 	  if (that.curArr.length !== newArr.length) {
 		that.curArr = newArr;
 		draw(newArr);
@@ -190,9 +190,9 @@ function BarGraph(ctx) {
 		// Set the target array to the new array
 		endArr = newArr;
 		// Animate from the start array to the end array
-		if (!looping) {	
+		if (!looping) {
 		  loop();
 		}
 	  }
-	}; 
+	};
 }

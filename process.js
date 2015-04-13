@@ -23,12 +23,22 @@ Stats.find({}, function(error, stat) {
     console.log('loaded stats');
   } else {
     for(var category in categories) {
-      categories[category].forEach(function(word) {
+      categories[category].track.forEach(function(word) {
         stats[word] = 0;
       });
     }
   }
 });
+
+var inBounds = function(coords) {
+  var sw = [-130, 24];
+  var ne = [-62, 50];
+  if(coords[0] > sw[0] && coords[0] < ne[0] &&
+     coords[1] > sw[1] && coords[1] < ne[1]) {
+      return true;
+  }
+  return false;
+}
 
 var num = 0;
 
@@ -40,7 +50,7 @@ var processTweets = function() {
     try {
       var tweet = JSON.parse(data.tweet);
 
-      if(tweet.coordinates) {
+      if(tweet.coordinates && inBounds(tweet.coordinates.coordinates)) {
 
         var keeper = new Located({ data: JSON.stringify(tweet) });
         keeper.save(function(error) {});
@@ -49,14 +59,13 @@ var processTweets = function() {
         for(var word in stats) {
           if(tweet.text.indexOf(word) >= 0) {
             locatedWord = word;
+            condensed = new Coords({
+              coordinates: tweet.coordinates.coordinates.toString(),
+              word: locatedWord
+            });
+            condensed.save(function(error) {});
           }
         }
-        condensed = new Coords({
-          coordinates: tweet.coordinates.coordinates.toString(),
-          word: locatedWord
-        });
-        console.log(condensed);
-        condensed.save(function(error) {});
       }
 
       for(var word in stats) {
