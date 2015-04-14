@@ -48,25 +48,23 @@
     $http.get('/3hun').success(function(data) {
       ui.tweets = data;
       ui.tweets.forEach(function(tweet) {
-        var latlong = tweet.coordinates.coordinates.reverse();
+        var latlong = tweet.coordinates.split(',').reverse();
         var circle = L.circle(latlong, 2000, {
           color: 'purple',
           fillColor: 'pink',
           fillOpacity: 0.75
         }).addTo(map2);
-        circle.bindPopup(tweet.text)
+        circle.bindPopup('<p><a href=http://twitter.com/'+tweet.user+'/status/'+
+          tweet.tweet_id+'>'+tweet.user+'</a>: '+tweet.text+'<p>');
       });
     });
 
     $http.get('/stats').success(function(data) {
-      if(data) {
-        ui.stats = angular.fromJson(data);
-        console.log(ui.stats);
-        var max = 0;
-        for(var num in ui.stats.totals) {
-          ui.categories.push(num);
-          if(ui.stats.totals[num] > max) { max = ui.stats.totals[num]; }
-        }
+      ui.stats = data;
+      var max = 0;
+      for(var num in ui.stats.totals) {
+        ui.categories.push(num);
+        if(ui.stats.totals[num] > max) { max = ui.stats.totals[num]; }
       }
     });
 

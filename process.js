@@ -7,7 +7,13 @@ mongoose.connect(conf.mongo.connect);
 
 var Tweet = mongoose.model('Tweet', { tweet: String });
 var Stats = mongoose.model('Stats', { numbers: String });
-var Located = mongoose.model('Located', { data: String });
+var Located = mongoose.model('Located', {
+  timestamp: { type : Date, default: Date.now },
+  text: String,
+  user: String,
+  coordinates: String,
+  tweet_id: String
+});
 
 var Coords = mongoose.model('Coords', {
   coordinates: String,
@@ -51,8 +57,12 @@ var processTweets = function() {
       var tweet = JSON.parse(data.tweet);
 
       if(tweet.coordinates && inBounds(tweet.coordinates.coordinates)) {
-
-        var keeper = new Located({ data: JSON.stringify(tweet) });
+        var keeper = new Located({
+          text: tweet.text,
+          user: tweet.user.screen_name,
+          coordinates: tweet.coordinates.coordinates.toString(),
+          tweet_id: tweet.id_str
+        });
         keeper.save(function(error) {});
 
         var locatedWord = '';
@@ -82,7 +92,7 @@ var processTweets = function() {
 
   stream.on('close', function() {
     Tweet.remove({}, function() {});
-    Stats.remove({}, function() {});
+    if(stats != null) { Stats.remove({}, function() {}); }
     var write = new Stats({ numbers: JSON.stringify(stats) });
     write.save(function(error) {});
     setTimeout(processTweets, 5000);
@@ -91,9 +101,9 @@ var processTweets = function() {
 
 var clean = function() {
   console.log('processed: '+num+'\t time: '+new Date());
-  Located.find({}, function(error, tweets) {
-    if(tweets.length > 300) {
-      var gone = tweets.slice(280, tweets.length);
+  Located.find({}).sort('timestamp').exec(function(error, tweets) {
+    if(tweets.length > 550) {
+      var gone = tweets.slice(480, tweets.length);
       gone.forEach(function(e) {
         Located.remove({ _id: e._id }, function() {});
       });

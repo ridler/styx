@@ -60,9 +60,7 @@ app.get('/3hun', function(req, res) {
   Located.find({}, function(error, data) {
     if(error) { res.send(error); }
     else {
-      var extract = [];
-      data.forEach(function(e) { extract.push(JSON.parse(e.data)); });
-      res.send(extract);
+      res.send(data);
     }
   });
 });
@@ -78,6 +76,7 @@ app.get('/stats', function(req, res) {
     if(error) { res.send(error); }
     else {
       try {
+        if(stats[0] == null) { console.log('null stats'); }
         var nums = JSON.parse(stats[0].numbers);
         var keys = Object.keys(nums);
         var all = 0;
@@ -92,7 +91,7 @@ app.get('/stats', function(req, res) {
         Object.keys(totals).forEach(function(category) {
           percentages[category] = totals[category]/all;
         });
-        res.send(JSON.stringify({totals: totals, percentages: percentages}));
+        res.send({totals: totals, percentages: percentages});
       } catch(e) { res.send(e); }
     }
   });
