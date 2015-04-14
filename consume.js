@@ -36,4 +36,4 @@ client.stream('statuses/filter', { track: keywords.toString(), location: usa }, 
 
 setInterval(function() {
   console.log('tweets: '+num+'\t'+'time: '+new Date());
-}, 30000);
+}, 2*60000);

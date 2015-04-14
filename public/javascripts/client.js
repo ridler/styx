@@ -36,7 +36,7 @@
         ui.coords = data;
         ui.coords.forEach(function(coord) {
           var latlong = coord.coordinates;
-          var circle = L.circle(latlong, 100, {
+          var circle = L.circle(latlong, 500, {
             color: coord.color,
             fillColor: coord.color,
             fillOpacity: 0.5
@@ -47,10 +47,9 @@
 
     $http.get('/3hun').success(function(data) {
       ui.tweets = data;
-      console.log(data[0]);
       ui.tweets.forEach(function(tweet) {
         var latlong = tweet.coordinates.coordinates.reverse();
-        var circle = L.circle(latlong, 30000, {
+        var circle = L.circle(latlong, 2000, {
           color: 'purple',
           fillColor: 'pink',
           fillOpacity: 0.75
@@ -59,60 +58,18 @@
       });
     });
 
-    var update = function() {
-      $http.get('/stats').success(function(data) {
-        if(data) {
-          ui.stats = angular.fromJson(data);
-          var max = 0;
-          for(var num in ui.stats.totals) {
-            ui.categories.push(num);
-            if(ui.stats.totals[num] > max) { max = ui.stats.totals[num]; }
-          }
-          graph.maxValue = max+200;
+    $http.get('/stats').success(function(data) {
+      if(data) {
+        ui.stats = angular.fromJson(data);
+        console.log(ui.stats);
+        var max = 0;
+        for(var num in ui.stats.totals) {
+          ui.categories.push(num);
+          if(ui.stats.totals[num] > max) { max = ui.stats.totals[num]; }
         }
-      });
-    };
-
-    update();
-
-    function createCanvas(divName) {
-
-      var div = document.getElementById(divName);
-      var canvas = document.createElement('canvas');
-      div.appendChild(canvas);
-      if (typeof G_vmlCanvasManager != 'undefined') {
-        canvas = G_vmlCanvasManager.initElement(canvas);
       }
-      var ctx = canvas.getContext("2d");
-      return ctx;
-    }
+    });
 
-    var ctx = createCanvas("graphDiv1");
-
-    var graph = new BarGraph(ctx);
-    graph.margin = 1;
-    graph.colors = ui.keyColors;
-    graph.xAxisLabelArr = ui.categories;
-    setInterval(function () {
-      try {
-        update();
-        var nums = [];
-        for(n in ui.stats.totals) { nums.push(ui.stats.totals[n]); }
-        if(ui.stats != null) { graph.update(nums); }
-      } catch(e) {}
-    }, 5000);
-
-    // var live = createCanvas("graphDiv2");
-
-    // var g2 = new BarGraph(live);
-    // g2.maxValue = 50;
-    // g2.margin = 2;
-    // g2.colors = ["#49a0d8", "#d353a0", "#ffc527", "#df4c27"];
-    // g2.xAxisLabelArr = ui.categories;
-    // setInterval(function () {
-    //   update();
-    //   g2.update([Math.random()*50, Math.random()*50, Math.random()*50]);
-    // }, 1000);
   }]);
 
 }());

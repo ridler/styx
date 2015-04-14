@@ -103,4 +103,4 @@ var clean = function() {
 
 processTweets();
 
-setInterval(clean, 30000);
+setInterval(clean, 2*60000);

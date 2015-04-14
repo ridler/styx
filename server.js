@@ -4,6 +4,11 @@ var logger = require('morgan');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var fs = require('fs');
+var net = require('net');
+
+var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
 Array.prototype.contains = function(q) {
   var ans = false;
@@ -18,6 +23,11 @@ var categories = JSON.parse(fs.readFileSync('keywords.json'));
 var totals = {}; var percentages = {};
 for(var category in categories) { totals[category] = 0; percentages[category] = 0 };
 
+var Tweet = mongoose.model('Tweet', { tweet: String });
+var Stats = mongoose.model('Stats', { numbers: String });
+var Located = mongoose.model('Located', { data: String });
+var Coords = mongoose.model('Coords', { coordinates: String, word: String });
+
 var color = function(word) {
   for(var category in categories) {
     if(categories[category].track.contains(word)) {
@@ -25,15 +35,6 @@ var color = function(word) {
     }
   }
 };
-
-var Tweet = mongoose.model('Tweet', { tweet: String });
-var Stats = mongoose.model('Stats', { numbers: String });
-var Located = mongoose.model('Located', { data: String });
-var Coords = mongoose.model('Coords', { coordinates: String, word: String });
-
-var app = express();
-
-var http = require('http').Server(app);
 
 app.get('/', function(req, res) {
   res.render('index');
