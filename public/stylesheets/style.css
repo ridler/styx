@@ -1,22 +1,25 @@
-.body .html { height: 100%; }
-
-#heat-map {
-  display: inline-block;
-  height: 400px;
-  width: 74%;
+html, body {
+  height: 100%;
+  min-width: 820px;
 }
 
-#mark-map {
-  display: inline-block;
-  height: 400px;
-  width: 74%;
+.full-h {
+  height: 100%;
+  padding-top: 70px;
 }
+
+.full-map {
+  display: inline-block;
+  height: 100%;
+  width: 77%;
+}
+
+#mark-map { width: 100%; }
 
 .map-side {
   display: inline-block;
-  overflow: scroll;
-  height: 400px;
-  width:25%;
+  height: 100%;
+  width:22%;
 }
 
-#graphDiv1{ width: 100px; }
+.no-collapse { min-width: 820px; }

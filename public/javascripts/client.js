@@ -10,7 +10,7 @@
     ui.tweets = [];
     ui.coords = [];
     ui.keyColors = [];
-    ui.cText = "Click on a circle to the right to see more information about it here."
+    ui.mostRecent = {};
 
     var map = L.map('heat-map').setView([38.50, -95.35], 4);
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -21,9 +21,6 @@
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map2);
-
-    map.scrollWheelZoom.disable();
-    map2.scrollWheelZoom.disable();
 
     $http.get('/kwconf').success(function(data) {
       for(var key in data) {
@@ -47,6 +44,7 @@
 
     $http.get('/3hun').success(function(data) {
       ui.tweets = data;
+      ui.mostRecent = data[data.length-1].text.split('').splice(0,50).join('');
       ui.tweets.forEach(function(tweet) {
         var latlong = tweet.coordinates.split(',').reverse();
         var circle = L.circle(latlong, 2000, {
