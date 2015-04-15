@@ -105,7 +105,6 @@ var net = require('net');
 var tcp = net.createServer(function(socket) {
     socket.on('data', function(data) {
       data = JSON.parse(data);
-      console.log(data);
       if(data.stats) {
         io.emit('stats', calcStats(data.stats));
       } else if(data.located) {
