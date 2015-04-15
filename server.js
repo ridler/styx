@@ -69,33 +69,51 @@ app.get('/kwconf', function(req, res) {
   res.send(categories);
 });
 
+var calcStats = function(stats) {
+  try {
+    var totals = {}; var percentages = {};
+    for(var category in categories) { totals[category] = 0; percentages[category] = 0 };
+    var nums = stats;
+    var keys = Object.keys(nums);
+    var all = 0;
+    keys.forEach(function(key) {
+      for(var category in categories) {
+        if(categories[category].track.contains(key)){
+          totals[category] += nums[key];
+          all += nums[key]
+        }
+      }
+    });
+    Object.keys(totals).forEach(function(category) {
+      percentages[category] = totals[category]/all;
+    });
+    return ({totals: totals, percentages: percentages});
+  } catch(e) { return e; }
+};
+
 app.get('/stats', function(req, res) {
-  var totals = {}; var percentages = {};
-  for(var category in categories) { totals[category] = 0; percentages[category] = 0 };
   Stats.find({}, function(error, stats) {
     if(error) { res.send(error); }
     else {
-      try {
-        if(stats[0] == null) { console.log('null stats'); }
-        var nums = JSON.parse(stats[0].numbers);
-        var keys = Object.keys(nums);
-        var all = 0;
-        keys.forEach(function(key) {
-          for(var category in categories) {
-            if(categories[category].track.contains(key)){
-              totals[category] += nums[key];
-              all += nums[key]
-            }
-          }
-        });
-        Object.keys(totals).forEach(function(category) {
-          percentages[category] = totals[category]/all;
-        });
-        res.send({totals: totals, percentages: percentages});
-      } catch(e) { res.send(e); }
+      var result = calcStats(JSON.parse(stats[0].numbers));
+      res.send(result);
     }
   });
 });
+
+var net = require('net');
+var tcp = net.createServer(function(socket) {
+    socket.on('data', function(data) {
+      data = JSON.parse(data);
+      console.log(data);
+      if(data.stats) {
+        io.emit('stats', calcStats(data.stats));
+      } else if(data.located) {
+        io.emit('located', data.located);
+      }
+    });
+});
+tcp.listen(conf.express.streamPort, conf.express.address);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

@@ -19,7 +19,7 @@
 					<li><a ng-click="ui.topTog = true" href="#">Statistics Map</a></li>
 					<li><a ng-click="ui.topTog = false" href="#">Interactive Map</a></li>
 				</ul>
-				<p class="navbar-text navbar-right"><strong>Most Recent Tweet: </strong>&quot{{ui.mostRecent}}...&quot</p>
+				<p class="navbar-text navbar-right"><strong>Most Recent Tweet: </strong>&quot{{ ui.mostRecent | limitTo: 60 }} {{ui.mostRecent.length < 60 ? '' : '...'}}&quot</p>
   		</div>
 		</nav>
 
@@ -30,6 +30,10 @@
 				<tr ng-repeat="(k, v) in ui.stats.totals">
 					<td>{{k}}</td><td>{{v | number}}</td><td>{{ui.stats.percentages[k] | number:2}}</td>
 				</tr>
+			</table>
+			<table class="table">
+				<tr><td>Five Second Total</td><td>{{ui.fiveSecSum}}</td></tr>
+				<tr><td>Percent of All Tweets</td><td>{{ui.fiveSecPer | number:5}}</td></tr>
 			</table>
 		</div>
 		<br />

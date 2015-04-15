@@ -22,6 +22,15 @@ var Coords = mongoose.model('Coords', {
 
 var categories = JSON.parse(fs.readFileSync('keywords.json'));
 
+var socket = net.Socket()
+
+var connect = function() {
+  try { socket.connect(conf.express.streamPort, conf.express.address); }
+  catch(e) { console.log(e); }
+}; connect();
+
+socket.on('error', function() { connect(); });
+
 var stats = {};
 Stats.find({}, function(error, stat) {
   if(stat[0] && stat[0].numbers != null) {
@@ -64,6 +73,7 @@ var processTweets = function() {
           tweet_id: tweet.id_str
         });
         keeper.save(function(error) {});
+        socket.write(JSON.stringify({located: keeper}));
 
         var locatedWord = '';
         for(var word in stats) {
@@ -95,6 +105,7 @@ var processTweets = function() {
     if(stats != null) { Stats.remove({}, function() {}); }
     var write = new Stats({ numbers: JSON.stringify(stats) });
     write.save(function(error) {});
+    socket.write(JSON.stringify({stats: stats}));
     setTimeout(processTweets, 5000);
   });
 }
@@ -102,8 +113,8 @@ var processTweets = function() {
 var clean = function() {
   console.log('processed: '+num+'\t time: '+new Date());
   Located.find({}).sort('timestamp').exec(function(error, tweets) {
-    if(tweets.length > 550) {
-      var gone = tweets.slice(480, tweets.length);
+    if(tweets.length > 600) {
+      var gone = tweets.slice(500, tweets.length);
       gone.forEach(function(e) {
         Located.remove({ _id: e._id }, function() {});
       });
@@ -113,4 +124,4 @@ var clean = function() {
 
 processTweets();
 
-setInterval(clean, 2*60000);
+clean(); setInterval(clean, 2*60000);

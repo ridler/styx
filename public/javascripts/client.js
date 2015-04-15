@@ -1,7 +1,32 @@
 (function () {
 
   var app = angular.module('hateUI', []);
-  app.controller('graphics', ['$http', function($http) {
+
+  app.factory('socket', function ($rootScope) {
+    var socket = io.connect();
+    return {
+      on: function (eventName, callback) {
+        socket.on(eventName, function () {
+          var args = arguments;
+          $rootScope.$apply(function () {
+            callback.apply(socket, args);
+          });
+        });
+      },
+      emit: function (eventName, data, callback) {
+        socket.emit(eventName, data, function () {
+          var args = arguments;
+          $rootScope.$apply(function () {
+            if (callback) {
+              callback.apply(socket, args);
+            }
+          });
+        })
+      }
+    };
+  });
+
+  app.controller('graphics', ['$http', 'socket', function($http, socket) {
     var ui = this;
     ui.title = 'Categorical Statistics';
     ui.markers = false;
@@ -12,6 +37,8 @@
     ui.keyColors = [];
     ui.mostRecent = {};
     ui.topTog = true;
+    ui.fiveSecSum = 0;
+    ui.fiveSecPer = 0;
 
     var map = L.map('heat-map').setView([38.50, -95.35], 4);
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -43,29 +70,42 @@
       }
     });
 
+    var drawTweet = function(tweet) {
+      var latlong = tweet.coordinates.split(',').reverse();
+      var circle = L.circle(latlong, 2000, {
+        color: 'purple',
+        fillColor: 'pink',
+        fillOpacity: 0.75
+      }).addTo(map2);
+      circle.bindPopup('<p><a href=http://twitter.com/'+tweet.user+'/status/'+
+        tweet.tweet_id+'>'+tweet.user+'</a>: '+tweet.text+
+        '<strong>  | '+tweet.timestamp+'<p>');
+    };
+
     $http.get('/3hun').success(function(data) {
       ui.tweets = data;
-      ui.mostRecent = data[data.length-1].text.split('').splice(0,50).join('');
-      ui.tweets.forEach(function(tweet) {
-        var latlong = tweet.coordinates.split(',').reverse();
-        var circle = L.circle(latlong, 2000, {
-          color: 'purple',
-          fillColor: 'pink',
-          fillOpacity: 0.75
-        }).addTo(map2);
-        circle.bindPopup('<p><a href=http://twitter.com/'+tweet.user+'/status/'+
-          tweet.tweet_id+'>'+tweet.user+'</a>: '+tweet.text+
-          '<strong>  | '+tweet.timestamp+'<p>');
-      });
+      ui.mostRecent = data[data.length-1].text;
+      ui.tweets.forEach(function(tweet) { drawTweet(tweet) });
     });
 
-    $http.get('/stats').success(function(data) {
+    $http.get('/stats').success(function(data) { ui.stats = data; });
+
+
+    socket.on('stats', function(data) {
+      var preSum = 0;
+      for(var n in ui.stats.totals) { preSum += ui.stats.totals[n]; }
       ui.stats = data;
-      var max = 0;
-      for(var num in ui.stats.totals) {
-        ui.categories.push(num);
-        if(ui.stats.totals[num] > max) { max = ui.stats.totals[num]; }
-      }
+
+      var newSum = 0;
+      for(var n in ui.stats.totals) { newSum += ui.stats.totals[n]; }
+      ui.fiveSecSum = newSum - preSum;
+      ui.fiveSecPer = 100*(ui.fiveSecSum/(5*6000));
+    });
+
+    socket.on('located', function(data) {
+      ui.tweets.push(data);
+      ui.mostRecent = data.text;
+      drawTweet(data);
     });
 
   }]);
