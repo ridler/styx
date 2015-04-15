@@ -41,7 +41,7 @@ app.get('/', function(req, res) {
 });
 
 app.get('/coords', function(req, res) {
-  Coords.find({}, function(error, data) {
+  Coords.find({}).limit(2900).exec(function(error, data) {
     if(error) { res.send(error); }
     else {
       var extract = [];
