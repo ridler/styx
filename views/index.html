@@ -14,17 +14,17 @@
 
 		<nav class="navbar navbar-default navbar-fixed-top">
   		<div class="container">
-				<a class="navbar-brand" href="#">STYX</a>
+				<a class="navbar-brand" ng-click="ui.topTog = true" href="#">STYX</a>
 				<ul class="nav navbar-nav">
-					<li><a href="#">Statistics Map</a></li>
-					<li><a href="#mark-map">Interactive Map</a></li>
+					<li><a ng-click="ui.topTog = true" href="#">Statistics Map</a></li>
+					<li><a ng-click="ui.topTog = false" href="#">Interactive Map</a></li>
 				</ul>
 				<p class="navbar-text navbar-right"><strong>Most Recent Tweet: </strong>&quot{{ui.mostRecent}}...&quot</p>
   		</div>
 		</nav>
 
-		<div id="heat-map" class="full-map"></div>
-		<div class="map-side">
+		<div id="heat-map" ng-show="ui.topTog" class="full-map"></div>
+		<div class="map-side" ng-show="ui.topTog">
 			<table class="table">
 				<th>Category</th><th>Total</th><th>Ratio</th>
 				<tr ng-repeat="(k, v) in ui.stats.totals">
@@ -33,7 +33,7 @@
 			</table>
 		</div>
 		<br />
-		<div id="mark-map" class="full-map"></div>
+		<div id="mark-map" ng-show="!ui.topTog" class="full-map"></div>
 		<br />
 		<br />
 	</div>

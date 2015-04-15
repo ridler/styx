@@ -11,6 +11,7 @@
     ui.coords = [];
     ui.keyColors = [];
     ui.mostRecent = {};
+    ui.topTog = true;
 
     var map = L.map('heat-map').setView([38.50, -95.35], 4);
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {

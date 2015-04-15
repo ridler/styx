@@ -1,11 +1,12 @@
 html, body {
   height: 100%;
   min-width: 820px;
+  overflow: hidden;
 }
 
 .full-h {
   height: 100%;
-  padding-top: 70px;
+  padding-top: 50px;
 }
 
 .full-map {
@@ -14,12 +15,13 @@ html, body {
   width: 77%;
 }
 
-#mark-map { width: 100%; }
+#mark-map {
+  width: 100%;
+  margin-top: -20px;
+}
 
 .map-side {
   display: inline-block;
   height: 100%;
   width:22%;
 }
-
-.no-collapse { min-width: 820px; }
