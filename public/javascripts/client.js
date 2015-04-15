@@ -55,7 +55,8 @@
           fillOpacity: 0.75
         }).addTo(map2);
         circle.bindPopup('<p><a href=http://twitter.com/'+tweet.user+'/status/'+
-          tweet.tweet_id+'>'+tweet.user+'</a>: '+tweet.text+'<p>');
+          tweet.tweet_id+'>'+tweet.user+'</a>: '+tweet.text+
+          '<strong>  | '+tweet.timestamp+'<p>');
       });
     });
 
