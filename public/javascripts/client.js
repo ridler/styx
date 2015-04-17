@@ -31,44 +31,68 @@
     ui.title = 'Categorical Statistics';
     ui.markers = false;
     ui.stats = {};
-    ui.categories = [];
+    ui.categories = {};
     ui.tweets = [];
-    ui.coords = [];
     ui.keyColors = [];
     ui.mostRecent = {};
     ui.topTog = true;
     ui.fiveSecSum = 0;
     ui.fiveSecPer = 0;
 
-    var map = L.map('heat-map').setView([38.50, -95.35], 4);
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    var map2 = L.map('mark-map').setView([38.50, -95.35], 4);
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map2);
-
     $http.get('/kwconf').success(function(data) {
+      ui.categories = data;
       for(var key in data) {
         ui.keyColors.push(data[key].color);
       }
     });
 
-    $http.get('/coords').success(function(data) {
-      if(data != {}) {
-        ui.coords = data;
-        ui.coords.forEach(function(coord) {
-          var latlong = coord.coordinates;
-          var circle = L.circle(latlong, 500, {
-            color: coord.color,
-            fillColor: coord.color,
-            fillOpacity: 0.5
-          }).addTo(map);
+    var colorSort = function(list, buckets, key) {
+      var sorted = {};
+      buckets.forEach(function(bucket) { sorted[bucket] = []; });
+      list.forEach(function(part) {
+        buckets.forEach(function(bucket) {
+          if(part[key] == bucket) { sorted[bucket].push(part); }
         });
+      });
+      return sorted;
+    };
+
+    $http.get('/coords').success(function(data) {
+      var dotLayers = [];
+      var buckets = colorSort(data, ui.keyColors, 'color');
+      var c = 0;
+      for(var bucket in buckets) {
+        dotLayers.push(new L.layerGroup());
+        buckets[bucket].forEach(function(coord) {
+          L.circle(coord.coordinates, 500, {
+              color: coord.color,
+              fillColor: coord.color,
+              fillOpacity: 0.5
+            }).addTo(dotLayers[c]);
+        });
+        c++;
       }
+      delete data;
+      var dots = L.layerGroup(dotLayers);
+
+      var overlayDots = {}; k = 0;
+      for(var category in ui.categories) {
+        overlayDots[category] = dotLayers[k];
+        k++;
+      };
+
+      var map = L.map('heat-map', { center: [38.50, -95.35], zoom: 4, layers: dotLayers });
+      L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      L.control.layers([],overlayDots).addTo(map);
     });
+
+    var map2 = L.map('mark-map').setView([38.50, -95.35], 4);
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map2);
 
     var drawTweet = function(tweet) {
       var latlong = tweet.coordinates.split(',').reverse();

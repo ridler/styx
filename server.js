@@ -2,7 +2,6 @@ var express = require('express');
 var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
 var fs = require('fs');
 var net = require('net');
 
@@ -10,30 +9,13 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+var init = require('./init');
+var db = require('./db');
+
 Array.prototype.contains = function(q) {
   var ans = false;
   this.forEach(function(e) { if(e == q) { ans = true; return; }});
   return ans;
-}
-
-var conf = JSON.parse(fs.readFileSync('resources.json'));
-mongoose.connect(conf.mongo.connect);
-
-var categories = JSON.parse(fs.readFileSync('keywords.json'));
-var totals = {}; var percentages = {};
-for(var category in categories) { totals[category] = 0; percentages[category] = 0 };
-
-var Tweet = mongoose.model('Tweet', { tweet: String });
-var Stats = mongoose.model('Stats', { numbers: String });
-var Located = mongoose.model('Located', { data: String });
-var Coords = mongoose.model('Coords', { coordinates: String, word: String });
-
-var color = function(word) {
-  for(var category in categories) {
-    if(categories[category].track.contains(word)) {
-      return categories[category]['color'];
-    }
-  }
 };
 
 app.get('/', function(req, res) {
@@ -41,14 +23,14 @@ app.get('/', function(req, res) {
 });
 
 app.get('/coords', function(req, res) {
-  Coords.find({}).limit(2900).exec(function(error, data) {
+  db.Coords.find({}).limit(2900).exec(function(error, data) {
     if(error) { res.send(error); }
     else {
       var extract = [];
       data.forEach(function(e) {
         extract.push({
           coordinates: e.coordinates.split(',').reverse(),
-          color: color(e.word)
+          color: init.color(e.word)
         });
       });
       res.send(extract);
@@ -57,7 +39,7 @@ app.get('/coords', function(req, res) {
 })
 
 app.get('/3hun', function(req, res) {
-  Located.find({}, function(error, data) {
+  db.Located.find({}, function(error, data) {
     if(error) { res.send(error); }
     else {
       res.send(data);
@@ -66,37 +48,18 @@ app.get('/3hun', function(req, res) {
 });
 
 app.get('/kwconf', function(req, res) {
-  res.send(categories);
+  res.send(init.categories);
 });
 
-var calcStats = function(stats) {
-  try {
-    var totals = {}; var percentages = {};
-    for(var category in categories) { totals[category] = 0; percentages[category] = 0 };
-    var nums = stats;
-    var keys = Object.keys(nums);
-    var all = 0;
-    keys.forEach(function(key) {
-      for(var category in categories) {
-        if(categories[category].track.contains(key)){
-          totals[category] += nums[key];
-          all += nums[key]
-        }
-      }
-    });
-    Object.keys(totals).forEach(function(category) {
-      percentages[category] = totals[category]/all;
-    });
-    return ({totals: totals, percentages: percentages});
-  } catch(e) { return e; }
-};
 
 app.get('/stats', function(req, res) {
-  Stats.find({}, function(error, stats) {
+  db.Stats.find({}, function(error, stats) {
     if(error) { res.send(error); }
     else {
-      var result = calcStats(JSON.parse(stats[0].numbers));
-      res.send(result);
+      try {
+        var result = init.stats.calc(JSON.parse(stats[0].numbers));
+        res.send(result);
+      } catch(e) { res.send(e); }
     }
   });
 });
@@ -106,13 +69,13 @@ var tcp = net.createServer(function(socket) {
     socket.on('data', function(data) {
       data = JSON.parse(data);
       if(data.stats) {
-        io.emit('stats', calcStats(data.stats));
+        io.emit('stats', init.stats.calc(data.stats));
       } else if(data.located) {
         io.emit('located', data.located);
       }
     });
 });
-tcp.listen(conf.express.streamPort, conf.express.address);
+tcp.listen(init.conf.express.streamPort, init.conf.express.address);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

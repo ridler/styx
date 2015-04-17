@@ -1,44 +1,24 @@
-var fs = require('fs');
 var net = require('net');
-var mongoose = require('mongoose');
-
-var conf = JSON.parse(fs.readFileSync('resources.json'));
-mongoose.connect(conf.mongo.connect);
-
-var Tweet = mongoose.model('Tweet', { tweet: String });
-var Stats = mongoose.model('Stats', { numbers: String });
-var Located = mongoose.model('Located', {
-  timestamp: { type : Date, default: Date.now },
-  text: String,
-  user: String,
-  coordinates: String,
-  tweet_id: String
-});
-
-var Coords = mongoose.model('Coords', {
-  coordinates: String,
-  word: String
-});
-
-var categories = JSON.parse(fs.readFileSync('keywords.json'));
+var db = require('./db');
+var init = require('./init');
 
 var socket = net.Socket()
 
 var connect = function() {
-  try { socket.connect(conf.express.streamPort, conf.express.address); }
+  try { socket.connect(init.conf.express.streamPort, init.conf.express.address); }
   catch(e) { console.log(e); }
 }; connect();
 
 socket.on('error', function() { connect(); });
 
 var stats = {};
-Stats.find({}, function(error, stat) {
+db.Stats.find({}, function(error, stat) {
   if(stat[0] && stat[0].numbers != null) {
     stats = JSON.parse(stat[0].numbers);
     console.log('loaded stats');
   } else {
-    for(var category in categories) {
-      categories[category].track.forEach(function(word) {
+    for(var category in init.categories) {
+      init.categories[category].track.forEach(function(word) {
         stats[word] = 0;
       });
     }
@@ -59,14 +39,14 @@ var num = 0;
 
 var processTweets = function() {
 
-  var stream = Tweet.find().stream();
+  var stream = db.Tweet.find().stream();
   stream.on('data', function(data) {
     num++;
     try {
       var tweet = JSON.parse(data.tweet);
 
       if(tweet.coordinates && inBounds(tweet.coordinates.coordinates)) {
-        var keeper = new Located({
+        var keeper = new db.Located({
           text: tweet.text,
           user: tweet.user.screen_name,
           coordinates: tweet.coordinates.coordinates.toString(),
@@ -79,7 +59,7 @@ var processTweets = function() {
         for(var word in stats) {
           if(tweet.text.indexOf(word) >= 0) {
             locatedWord = word;
-            condensed = new Coords({
+            condensed = new db.Coords({
               coordinates: tweet.coordinates.coordinates.toString(),
               word: locatedWord
             });
@@ -101,9 +81,9 @@ var processTweets = function() {
   });
 
   stream.on('close', function() {
-    Tweet.remove({}, function() {});
-    if(stats != null) { Stats.remove({}, function() {}); }
-    var write = new Stats({ numbers: JSON.stringify(stats) });
+    db.Tweet.remove({}, function() {});
+    if(stats != null) { db.Stats.remove({}, function() {}); }
+    var write = new db.Stats({ numbers: JSON.stringify(stats) });
     write.save(function(error) {});
     socket.write(JSON.stringify({stats: stats}));
     setTimeout(processTweets, 5000);
@@ -112,11 +92,11 @@ var processTweets = function() {
 
 var clean = function() {
   console.log('processed: '+num+'\t time: '+new Date());
-  Located.find({}).sort('timestamp').exec(function(error, tweets) {
+  db.Located.find({}).sort('timestamp').exec(function(error, tweets) {
     if(tweets.length > 600) {
       var gone = tweets.slice(500, tweets.length);
       gone.forEach(function(e) {
-        Located.remove({ _id: e._id }, function() {});
+        db.Located.remove({ _id: e._id }, function() {});
       });
     }
   });
