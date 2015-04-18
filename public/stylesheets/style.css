@@ -4,6 +4,12 @@ html, body {
   overflow: hidden;
 }
 
+.ctr {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .full-h {
   height: 100%;
   padding-top: 50px;
@@ -12,7 +18,7 @@ html, body {
 .full-map {
   display: inline-block;
   height: 100%;
-  width: 77%;
+  width: 75%;
 }
 
 #mark-map {
@@ -22,6 +28,7 @@ html, body {
 
 .map-side {
   display: inline-block;
+  overflow: scroll;
   height: 100%;
-  width:22%;
+  width:24%;
 }

@@ -26,10 +26,18 @@
     };
   });
 
+  app.directive('loadingCircle', function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'templates/loading-circle.html'
+    }
+  });
+
   app.controller('graphics', ['$http', 'socket', function($http, socket) {
     var ui = this;
     ui.title = 'Categorical Statistics';
-    ui.markers = false;
+    ui.loaded = false;
+    ui.showWords = false;
     ui.stats = {};
     ui.categories = {};
     ui.tweets = [];
@@ -87,6 +95,7 @@
       }).addTo(map);
 
       L.control.layers([],overlayDots).addTo(map);
+      ui.loaded = true;
     });
 
     var map2 = L.map('mark-map').setView([38.50, -95.35], 4);

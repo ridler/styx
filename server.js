@@ -23,7 +23,7 @@ app.get('/', function(req, res) {
 });
 
 app.get('/coords', function(req, res) {
-  db.Coords.find({}).limit(2900).exec(function(error, data) {
+  db.Coords.find({}).sort('timestamp').limit(5000).exec(function(error, data) {
     if(error) { res.send(error); }
     else {
       var extract = [];
