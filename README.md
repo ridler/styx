@@ -1,5 +1,5 @@
 # STYX
-STYX does keyword processing for the Twitter Streaming API.  It will categorize tweets in the USA based on categories and words that the user provides.  It uses MongoDB as a cache as well as to store all relevant generated data.  Tweets with geocoordinates will be saved for mapping purposes.  The last 300 tweets consumed with geocoordinates will be mapped in real time on the UI.
+STYX does keyword processing for the Twitter Streaming API.  It will categorize tweets in the USA based on categories and words that the user provides.  It uses MongoDB as a cache as well as to store all relevant generated data.  Tweets with geocoordinates will be saved for mapping purposes.  The last 500 tweets consumed with geocoordinates will be mapped in real time on the UI.
 
 ## Setup
 
@@ -8,24 +8,33 @@ To run this system, you must supply a keywords file. Each word in the inner arra
 
 ``` json
 {
-  "wine": [
-    "cabernet sauvignon",
-    "merlot",
-    "chardonnay"
-  ],
-  "beer": [
-    "IPA",
-    "trippel",
-    "witbier",
-    "stout"
-  ],
-  "cocktails": [
-    "negroni",
-    "margarita"
+  "wine": {
+    "color": "red",
+    "track": [
+      "cabernet sauvignon",
+      "merlot",
+      "chardonnay"
+    ]
+  },
+  "beer": {
+    "color": "orange",
+    "track": [
+      "IPA",
+      "trippel",
+      "lager",
+      "stout"
+    ]
+  },
+  "cocktails": {
+    "color": "yellow",
+    "track": [
+      "negroni",
+      "margarita",
+      "martini"
   ]
 }
 ```
-cabernet sauvignon, merlot, chardonnay, IPA, etc. would be tracked on twitter, then the processor file would put each tweet containing whatever word into its outer "category".
+cabernet sauvignon, merlot, chardonnay, IPA, etc. would be tracked on twitter, then the processor file would put each tweet containing whatever word into its outer "category", and corresponding geo-tagged tweets would appear as points on the map in the specified "color" attribute.
 
 ## `auth.json`
 You must provide your Twitter API credentials in the following format:
@@ -47,7 +56,7 @@ You must provide the connection URI of a MongoDB instance and an Express server 
   },
   "express": {
     "address": "0.0.0.0",
-    "port": 3000
+    "streamPort": 3000
   }
 }
 ```
@@ -64,9 +73,3 @@ Data should start appearing on a webpage at `localhost:8080` after a few seconds
 - `server.js` provides web applications features through Express.js.  It serves content in `public/` and `views/`.
 - `consume.js` establishes a connection to the Twitter API and writes tweets to mongo as soon as they are recieved.
 - `process.js` reads tweets off of mongo and does initial processing on them.  It then writes generated data back to the same mongo instance.
-
-# TO DO
-- Implement direct streaming of data between `process.js` and `server.js`.
-- Implement richer processing of the data.
-- Map the geolocated data.
-- Develop a real UI.
