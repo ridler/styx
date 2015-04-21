@@ -105,9 +105,9 @@ var clean = function() {
       var gone = coords.slice(8000, coords.length);
       gone.forEach(function(e) {
         db.Coords.remove({ _id: e._id }, function() {});
-      })
+      });
     }
-  }
+  });
 }
 
 processTweets();
