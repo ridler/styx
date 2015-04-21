@@ -100,6 +100,14 @@ var clean = function() {
       });
     }
   });
+  db.Coords.find({}).sort('timestamp').exec(function(error, coords) {
+    if(coords.length > 9000) {
+      var gone = coords.slice(8000, coords.length);
+      gone.forEach(function(e) {
+        db.Coords.remove({ _id: e._id }, function() {});
+      })
+    }
+  }
 }
 
 processTweets();
