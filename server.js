@@ -67,12 +67,14 @@ app.get('/stats', function(req, res) {
 var net = require('net');
 var tcp = net.createServer(function(socket) {
     socket.on('data', function(data) {
-      data = JSON.parse(data);
-      if(data.stats) {
-        io.emit('stats', init.stats.calc(data.stats));
-      } else if(data.located) {
-        io.emit('located', data.located);
-      }
+      try {
+        data = JSON.parse(data);
+        if(data.stats) {
+          io.emit('stats', init.stats.calc(data.stats));
+        } else if(data.located) {
+          io.emit('located', data.located);
+        }
+      } catch(e) {}
     });
 });
 tcp.listen(init.conf.express.streamPort, init.conf.express.address);

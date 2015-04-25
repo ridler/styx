@@ -100,11 +100,13 @@ var clean = function() {
       });
     }
   });
-  db.Coords.find({}).sort('timestamp').exec(function(error, coords) {
-    if(coords.length > 9000) {
-      var gone = coords.slice(8000, coords.length);
-      gone.forEach(function(e) {
-        db.Coords.remove({ _id: e._id }, function() {});
+  db.Coords.count({}, function(error, count) {
+    if(count > 100000) {
+      db.Coords.find({}).sort('timestamp').exec(function(error, coords) {
+        var gone = coords.slice(990000, coords.length);
+        gone.forEach(function(e) {
+          db.Coords.remove({ _id: e._id }, function() {});
+        });
       });
     }
   });
