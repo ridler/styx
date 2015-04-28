@@ -64,6 +64,10 @@ app.get('/stats', function(req, res) {
   });
 });
 
+app.get('/counties', function(req, res) {
+  res.render('counties');
+});
+
 var net = require('net');
 var tcp = net.createServer(function(socket) {
     socket.on('data', function(data) {

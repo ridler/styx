@@ -23,7 +23,11 @@ html, body {
 
 #mark-map {
   width: 100%;
-  margin-top: -20px;
+  margi-top: -20px;
+}
+
+#county-map {
+  width: 100%;
 }
 
 .map-side {
