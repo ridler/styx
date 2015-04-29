@@ -3,18 +3,21 @@
 <head>
 	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="stylesheets/style.css" />
-	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+	<link rel="stylesheet" href="//cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
 	<title>Categorical Twitter Statistics</title>
 </head>
 
-<body ng-controller="graphics as ui">
-	<div class="container-fluid full-h">
+<body ng-controller="graphics as ui" class="container-fluid">
+
+	<h1 ng-show="!ui.loaded">Loading...</h1>
+
+	<div ng-show="ui.loaded" class="full-h">
 		<div id="county-map" class="full-map"></div>
 
 	</div>
 
-	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+	<script src="//cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 	<script src="javascripts/counties.js"></script>
 </body>
 </html>
