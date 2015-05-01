@@ -20,8 +20,8 @@
 
     $http.get('/talliedCounties.json').success(function(data) {
 
-      var colors = ['#FFFFFF', '#FFC0C0', '#FF8080', '#FF4040', '#FF0000'];
-      var colorCode = {};
+      var colors = ['#FFC0C0', '#FF8080', '#FF4040', '#FF0000'];
+      var colorCode = {'#FFFFFF': {'sequence': 0, 'range': [0, 0]}};
       var seq = 1;
       colors.forEach(function(color) {
         colorCode[color] = {
@@ -38,8 +38,8 @@
         }
       });
 
-      var scalor = max/5; var bounds = [0];
-      for(var i = 1; i <= 5; i++) {
+      var scalor = max/4; var bounds = [0];
+      for(var i = 1; i <= 4; i++) {
         bounds.push(bounds[i-1]+scalor);
         for(var color in colorCode) {
           if(colorCode[color].sequence == i) {
@@ -52,10 +52,13 @@
         style: function(feature) {
 
           var c = '';
-          for(var color in colorCode) {
-            if(feature.properties.ratio >= colorCode[color].range[0] &&
-                feature.properties.ratio <= colorCode[color].range[1]) {
-              c = color;
+          if(feature.properties.ratio == 0) { c = '#FFFFFF'; }
+          else {
+            for(var color in colorCode) {
+              if(feature.properties.ratio >= colorCode[color].range[0] &&
+                  feature.properties.ratio <= colorCode[color].range[1]) {
+                c = color;
+              }
             }
           }
           return {
