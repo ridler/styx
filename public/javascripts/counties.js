@@ -18,19 +18,55 @@
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    var count = 0; var colors = ['red', 'yellow', 'green', 'blue'];
-    $http.get('/geoCounties.json').success(function(data) {
+    $http.get('/talliedCounties.json').success(function(data) {
+
+      var colors = ['#FFFFFF', '#FFC0C0', '#FF8080', '#FF4040', '#FF0000'];
+      var colorCode = {};
+      var seq = 1;
+      colors.forEach(function(color) {
+        colorCode[color] = {
+          'sequence': seq++,
+          'range': null
+        };
+      });
+      delete seq; delete colors;
+
+      var max = 0;
+      data.features.forEach(function(county) {
+        if(county.properties.ratio > max) {
+          max = county.properties.ratio;
+        }
+      });
+
+      var scalor = max/5; var bounds = [0];
+      for(var i = 1; i <= 5; i++) {
+        bounds.push(bounds[i-1]+scalor);
+        for(var color in colorCode) {
+          if(colorCode[color].sequence == i) {
+            colorCode[color].range = [bounds[i-1], bounds[i-1]+scalor]
+          }
+        }
+      }
+
       L.geoJson(data, {
         style: function(feature) {
-          var i = Math.ceil(9*Math.random());
-          var c = '#FF'+i+''+i+''+i+'0';
+
+          var c = '';
+          for(var color in colorCode) {
+            if(feature.properties.ratio >= colorCode[color].range[0] &&
+                feature.properties.ratio <= colorCode[color].range[1]) {
+              c = color;
+            }
+          }
           return {
-            color: 'red',
+            color: c,
             weight: 0.2
           };
         },
         onEachFeature: function(feature, layer) {
-          layer.bindPopup(feature.properties.NAME);
+          layer.bindPopup('<p>'+feature.properties.NAME+'</p>'+
+            '<p>'+feature.properties.population+'</p>'+
+            '<p>'+feature.properties.ratio+'</p>');
         }
       }).addTo(map);
 
