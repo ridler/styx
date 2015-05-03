@@ -10,7 +10,17 @@
 
 <body ng-controller="graphics as ui" class="container-fluid">
 
-	<h1 ng-show="!ui.loaded">Loading...</h1>
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container">
+			<a class="navbar-brand" ng-click="ui.topTog = true" href="#">STYX</a>
+			<ul class="nav navbar-nav">
+				<li><a href="/">Home</a></li>
+				<li><a href="#">County Map</a></li>
+			</ul>
+		</div>
+	</nav>
+
+	<h1 style="margin-top:50px" ng-show="!ui.loaded">Loading...</h1>
 
 	<div ng-show="ui.loaded" class="full-h">
 		<div id="county-map" class="full-map"></div>

@@ -18,6 +18,7 @@
 				<ul class="nav navbar-nav">
 					<li><a ng-click="ui.topTog = true" href="#">Statistics Map</a></li>
 					<li><a ng-click="ui.topTog = false" href="#">Interactive Map</a></li>
+					<li><a href="/counties">County Map</a></li>
 				</ul>
 				<p class="navbar-text navbar-right"><strong>Most Recent Tweet: </strong>&quot{{ ui.mostRecent | limitTo: 60 }} {{ui.mostRecent.length < 60 ? '' : '...'}}&quot</p>
   		</div>

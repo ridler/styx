@@ -63,13 +63,16 @@
           }
           return {
             color: c,
-            weight: 0.2
+            weight: 0.5
           };
         },
         onEachFeature: function(feature, layer) {
-          layer.bindPopup('<p>'+feature.properties.NAME+'</p>'+
-            '<p>'+feature.properties.population+'</p>'+
-            '<p>'+feature.properties.ratio+'</p>');
+          layer.bindPopup('<table class="table-condensed">'+
+            '<tr><td>Name</td><td>'+feature.properties.NAME+'</td></tr>'+
+            '<tr><td>Population</td><td>'+feature.properties.population+'</td></tr>'+
+            '<tr><td>Tweets</td><td>'+feature.properties.tweetCount+'</td></tr>'+
+            '<tr><td>Rating</td><td>'+Math.floor(feature.properties.ratio)+'</td></tr>'+
+            '</table>');
         }
       }).addTo(map);
 
