@@ -1,0 +1,1 @@
+auth.json resources.json keywords.json files go here
