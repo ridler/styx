@@ -11,7 +11,7 @@ for(var category in init.categories) {
 
 var usa = '-125.4,27.5,-58.9,50.3';
 
-var client = new Twitter(JSON.parse(fs.readFileSync('auth.json')));
+var client = new Twitter(JSON.parse(fs.readFileSync('./conf/auth.json')));
 
 var num = 0;
 

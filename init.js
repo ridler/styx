@@ -1,8 +1,12 @@
 var fs = require('fs');
+var path = require('path');
 
-exports.conf = JSON.parse(fs.readFileSync('resources.json'));
+var resources = path.join(__dirname, 'conf', 'resources.json');
+var keywords = path.join(__dirname, 'conf', 'keywords.json');
 
-var categories = JSON.parse(fs.readFileSync('keywords.json'));
+exports.conf = JSON.parse(fs.readFileSync(resources));
+
+var categories = JSON.parse(fs.readFileSync(resources));
 
 exports.color = function(word) {
   for(var category in categories) {
