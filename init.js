@@ -6,7 +6,7 @@ var keywords = path.join(__dirname, 'conf', 'keywords.json');
 
 exports.conf = JSON.parse(fs.readFileSync(resources));
 
-var categories = JSON.parse(fs.readFileSync(resources));
+var categories = JSON.parse(fs.readFileSync(keywords));
 
 exports.color = function(word) {
   for(var category in categories) {

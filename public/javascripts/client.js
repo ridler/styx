@@ -26,13 +26,6 @@
     };
   });
 
-  app.directive('loadingCircle', function() {
-    return {
-      restrict: 'E',
-      templateUrl: 'templates/loading-circle.html'
-    }
-  });
-
   app.controller('graphics', ['$http', 'socket', function($http, socket) {
     var ui = this;
     ui.title = 'Categorical Statistics';
