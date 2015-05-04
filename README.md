@@ -3,7 +3,9 @@ STYX does keyword processing for the Twitter Streaming API.  It will categorize 
 
 ## Setup
 
-### `keywords.json`
+### The `/conf` directory
+
+#### `keywords.json`
 To run this system, you must supply a keywords file. Each word in the inner arrays will be tracked on twitter, and the outer categories will be used to summarize the data.  For example, if you were worndering what type of alcoholic beverages people tweeted about most often, you would do something like this in the `keywords.json' file.
 
 ``` json
@@ -36,7 +38,7 @@ To run this system, you must supply a keywords file. Each word in the inner arra
 ```
 cabernet sauvignon, merlot, chardonnay, IPA, etc. would be tracked on twitter, then the processor file would put each tweet containing whatever word into its outer "category", and corresponding geo-tagged tweets would appear as points on the map in the specified "color" attribute.
 
-## `auth.json`
+#### `auth.json`
 You must provide your Twitter API credentials in the following format:
 ```json
 {
@@ -47,7 +49,7 @@ You must provide your Twitter API credentials in the following format:
 }
 ```
 
-## `resources.json`
+#### `resources.json`
 You must provide the connection URI of a MongoDB instance and an Express server in the following format:
 ```json
 {
@@ -61,11 +63,12 @@ You must provide the connection URI of a MongoDB instance and an Express server 
 }
 ```
 ### Running the System
-Run each of the following commands seperately and make sure they output something that isn't an error.
+Run each of the following commands seperately in the order listed below and make sure they output something that isn't an error.
 ```bash
+npm install
 node consume.js
-node process.js
 node server.js
+node process.js
 ```
 Data should start appearing on a webpage at `localhost:8080` after a few seconds.
 
@@ -73,3 +76,7 @@ Data should start appearing on a webpage at `localhost:8080` after a few seconds
 - `server.js` provides web applications features through Express.js.  It serves content in `public/` and `views/`.
 - `consume.js` establishes a connection to the Twitter API and writes tweets to mongo as soon as they are recieved.
 - `process.js` reads tweets off of mongo and does initial processing on them.  It then writes generated data back to the same mongo instance.
+
+## The `counties/` directory
+
+In order to normalize the data for population data (to see if any specific county has relatively more tweets about your topic than other areas), you can use the `counties/box.js` file to generate a GeoJSON file that will be loaded into the counties page on the Express.js application.  This feature is definitely in the "experimental" phase.
